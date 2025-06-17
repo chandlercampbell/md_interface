@@ -7,25 +7,7 @@ $VenvName = "venv"
 $VenvPath = Join-Path $ScriptDirectory $VenvName
 
 
-function python {
-    if (Get-Command python -ErrorAction SilentlyContinue) {
-        & python @args
-    } elseif (Get-Command python3 -ErrorAction SilentlyContinue) {
-        & python3 @args
-    } else {
-        Write-Error "Neither python nor python found in PATH"
-    }
-}
 
-function pip {
-    if (Get-Command pip -ErrorAction SilentlyContinue) {
-        & pip @args
-    } elseif (Get-Command pip3 -ErrorAction SilentlyContinue) {
-        & pip3 @args
-    } else {
-        Write-Error "Neither pip nor pip3 found in PATH"
-    }
-}
 
 # Check if virtual environment already exists
 if (-Not (Test-Path $VenvPath)) {
