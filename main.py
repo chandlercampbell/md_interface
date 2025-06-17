@@ -14,7 +14,7 @@ import cv2
 import os
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
-def draw_detections(detection_data, output_dir, confidence_threshold=0.5):
+def draw_detections(detection_data, input_dir, output_dir, confidence_threshold=0.5):
     """
     Draw red bounding boxes on images for detections above threshold
     
@@ -95,9 +95,9 @@ def draw_detections(detection_data, output_dir, confidence_threshold=0.5):
                            font, font_scale, (255, 255, 255), thickness)
         
         # Save the image with bounding boxes
-        filename = Path(file_path).name
-        output_path = os.path.join(output_dir, filename)
-        
+        file_relpath = os.path.relpath(file_path, input_dir)
+        output_path = os.path.join(output_dir, file_relpath)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
         cv2.imwrite(output_path, img)
         print(f"Saved: {output_path}")
 
@@ -289,7 +289,7 @@ class DetectionInterface:
                 split_results = divide_list(self.results, cores)
                 confidence = self.slider_var.get()
                 with ThreadPoolExecutor(max_workers=cores) as executor:
-                    futures = [executor.submit(draw_detections, i, output_path, confidence) for i in split_results]
+                    futures = [executor.submit(draw_detections, i, input_path, output_path, confidence) for i in split_results]
                     _ = [future.result() for future in futures]
                 write_results_to_file(
                     self.results,
