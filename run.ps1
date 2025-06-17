@@ -6,10 +6,31 @@ Set-Location $ScriptDirectory
 $VenvName = "venv"
 $VenvPath = Join-Path $ScriptDirectory $VenvName
 
+
+function python {
+    if (Get-Command python -ErrorAction SilentlyContinue) {
+        & python @args
+    } elseif (Get-Command python3 -ErrorAction SilentlyContinue) {
+        & python3 @args
+    } else {
+        Write-Error "Neither python nor python found in PATH"
+    }
+}
+
+function pip {
+    if (Get-Command pip -ErrorAction SilentlyContinue) {
+        & pip @args
+    } elseif (Get-Command pip3 -ErrorAction SilentlyContinue) {
+        & pip3 @args
+    } else {
+        Write-Error "Neither pip nor pip3 found in PATH"
+    }
+}
+
 # Check if virtual environment already exists
 if (-Not (Test-Path $VenvPath)) {
     Write-Host "Creating virtual environment..." -ForegroundColor Green
-    python3 -m venv $VenvName
+    python -m venv $VenvName
     
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed to create virtual environment. Make sure Python is installed and accessible."
@@ -40,6 +61,6 @@ if ($FoundPath -eq 0) {
 }
 
 
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 
-python3 main.py
+python main.py
