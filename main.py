@@ -13,7 +13,7 @@ from contextlib import redirect_stdout, redirect_stderr
 import cv2
 import os
 from pathlib import Path
-
+from concurrent.futures import ThreadPoolExecutor
 def draw_detections(detection_data, output_dir, confidence_threshold=0.5):
     """
     Draw red bounding boxes on images for detections above threshold
@@ -267,7 +267,15 @@ class DetectionInterface:
         input_path = self.input_dir.get()
         output_path = self.output_dir.get()
 
+        def divide_list(lst, n):
+            if n > len(lst):
+                n = len(lst)
+            k, m = divmod(len(lst), n)
+            return [lst[i*k + min(i, m):(i+1)*k + min(i+1, m)] for i in range(n)]
+
+
         def _run_detection():
+            
             redirector = StreamingTextRedirector(self.output_text)
             with redirect_stdout(redirector), redirect_stderr(redirector):
                 self.disable_inputs()
@@ -275,9 +283,14 @@ class DetectionInterface:
                     model_file="MDV5A",
                     image_file_names=input_path,
                     checkpoint_path=os.path.join(output_path, "checkpoint.chkpt"),
-                    checkpoint_frequency=1000
+                    checkpoint_frequency=1000,
                 )
-                draw_detections(self.results, output_path, confidence_threshold=self.slider_var.get())
+                cores = os.cpu_count() or 1
+                split_results = divide_list(self.results, cores)
+                confidence = self.slider_var.get()
+                with ThreadPoolExecutor(max_workers=cores) as executor:
+                    futures = [executor.submit(draw_detections, i, output_path, confidence) for i in split_results]
+                    _ = [future.result() for future in futures]
                 write_results_to_file(
                     self.results,
                     output_file=os.path.join(output_path, "detections.json"),
