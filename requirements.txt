@@ -1,0 +1,3 @@
+megadetector
+ipykernel
+ipyfilechooser
