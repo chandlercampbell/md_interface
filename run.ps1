@@ -41,7 +41,7 @@ if ($FoundPath -eq 0) {
     Write-Error "Failed to find activation script for the virtual environment."
     exit 1
 }
-
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 pip install -r requirements.txt
 

@@ -31,6 +31,7 @@ else
     echo -e "\033[31mError: Failed to find activation script at $ACTIVATE_SCRIPT\033[0m" >&2
     exit 1
 fi
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 # Install requirements and run main script
 pip3 install -r requirements.txt
