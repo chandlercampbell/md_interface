@@ -25,9 +25,9 @@ if (-Not (Test-Path $VenvPath)) {
 # Activate the virtual environment
 Write-Host "Activating virtual environment..." -ForegroundColor Green
 $Paths = @(
-    Join-Path $VenvPath "Scripts" "Activate.ps1"  # Windows
-    Join-Path $VenvPath "bin" "Activate.ps1"          # Linux
-    Join-Path $VenvPath "bin" "activate.ps1"        # uv
+    (Join-Path $VenvPath "Scripts" | Join-Path -ChildPath "Activate.ps1")  # Windows
+    (Join-Path $VenvPath "bin" | Join-Path -ChildPath "Activate.ps1")      # Linux
+    (Join-Path $VenvPath "bin" | Join-Path -ChildPath "activate.ps1")      # uv
 )
 $FoundPath = 0
 foreach ($Path in $Paths) {
